@@ -13,18 +13,39 @@ import java.util.List;
 @RestController
 @RequestMapping("users")
 public class UserController {
+
     @Autowired
     private UserService userService;
+    @Operation(summary = "Listar Todos os Usuários", tags = "User")
+    @GetMapping
+    public ResponseEntity<List<User>> listarTodos() {
+        return ResponseEntity.ok(userService.listarTodos());
+    }
 
-//    @GetMapping
-//    public List<User> listarTodos() {
-//        return userService.listarTodos();
-//    }
-    @Operation(summary = "Save a new User", tags = "User")
+    @Operation(summary = "Buscar Usuários por ID", tags = "User")
+    @GetMapping("/{id}")
+    public ResponseEntity<User> buscarPorId(@PathVariable Long id) {
+        User user = userService.buscarPorId(id);
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    }
+
+    @Operation(summary = "Salvar um novo Usuário", tags = "User")
     @PostMapping
-    public ResponseEntity<User> save(@RequestBody User user) {
+    public ResponseEntity<List<User>> save(@RequestBody User user) {
         userService.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body((User) userService.listarTodos());
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.listarTodos());
+    }
+
+    @Operation(summary = "Atualizar Usuário", tags = "User")
+    @PutMapping("/{id}")
+    public ResponseEntity<User> atualizar(@PathVariable Long id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.atualizar(id, user));
+    }
+
+    @Operation(summary = "Deletar Usuário", tags = "User")
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable Long id) {
+        userService.deletar(id);
     }
 
 }
